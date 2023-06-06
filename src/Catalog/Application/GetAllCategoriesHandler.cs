@@ -1,15 +1,19 @@
-﻿using AutoFixture;
-using Catalog.Domain;
+﻿using Catalog.Domain;
 
 namespace Catalog.Application
 {
     public class GetAllCategoriesHandler
     {
-        public static async Task<List<Category>> Handle(GetCategoriesQuery getCategoriesQuery)
+        private readonly ICatalogRepository _repository;
+
+        public GetAllCategoriesHandler(ICatalogRepository repository)
         {
-            //Do stuff
-            var fixture = new Fixture();
-            return fixture.Create<List<Category>>();
+            _repository = repository;
+        }
+
+        public async Task<List<Category>> Handle(GetCategoriesQuery getCategoriesQuery)
+        {
+            return await _repository.GetAll();
         }
     }
 }

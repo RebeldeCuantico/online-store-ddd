@@ -6,44 +6,44 @@
 
         public Entity(EntityId id)
         {
-
+            Id = id;
         }
 
         public virtual EntityId Id { get; protected set; }
 
         public override bool Equals(object obj)
         {
-            if( obj is not Entity other)
+            if (obj is not Entity other)
             {
                 return false;
             }
 
-            if(ReferenceEquals(this, other) )
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }
 
-            if(GetUnproxiedType(this) != GetUnproxiedType(other))
+            if (GetUnproxiedType(this) != GetUnproxiedType(other))
             {
                 return false;
             }
 
-            if(Id.Equals(default) || other.Id.Equals(default))
+            if (Id.Equals(default) || other.Id.Equals(default))
             {
                 return false;
             }
 
-            return Id.Equals(other.Id); 
+            return Id.Equals(other.Id);
         }
 
         public static bool operator ==(Entity first, Entity second)
         {
-            if(first is null && second is null)
+            if (first is null && second is null)
             {
                 return true;
             }
 
-            if(first is null || second is null)
+            if (first is null || second is null)
             {
                 return false;
             }
@@ -56,8 +56,8 @@
             return !(first == second);
         }
 
-        public override int GetHashCode() 
-        { 
+        public override int GetHashCode()
+        {
             return (GetUnproxiedType(this).ToString() + Id).GetHashCode();
         }
 
