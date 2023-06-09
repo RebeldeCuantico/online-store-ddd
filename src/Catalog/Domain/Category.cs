@@ -1,4 +1,5 @@
-﻿using Common.Domain;
+﻿using Catalog.Domain.DomainEvents;
+using Common.Domain;
 
 namespace Catalog.Domain
 {
@@ -10,7 +11,9 @@ namespace Catalog.Domain
             : base(id)
         {
             Name = name;
-            Description = description;                
+            Description = description;
+
+            QueueEvent(new CategoryAdded(this));
         }
 
         public Name Name { get; private set; }
@@ -19,12 +22,18 @@ namespace Catalog.Domain
 
         public void ChangeName(string name)
         {
+            var oldName = Name.Value;
             Name = new Name(name);
+
+            QueueEvent(new CategoryNameModified(Id.Value, oldName, name));
         }
 
         public void ChangeDescription(string description)
         {
+            var oldDescription = Description.Value;
             Description = new Description(description);
+
+            QueueEvent(new CategoryDescriptionModified(Id.Value, oldDescription, description));
         }
     }
 }

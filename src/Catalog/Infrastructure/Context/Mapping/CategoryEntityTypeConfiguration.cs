@@ -14,6 +14,7 @@ namespace Catalog.Infrastructure.Context.Mapping
             builder.Property(c => c.Id).HasConversion(x => x.Value, l => new EntityId(l));
             builder.OwnsOne(c => c.Name).Property(p=>p.Value).HasColumnName("Name").IsRequired();
             builder.OwnsOne(c => c.Description).Property(p => p.Value).HasColumnName("Description").IsRequired();
+            builder.Ignore(c => c.DomainEvents);
         }
     }
 }

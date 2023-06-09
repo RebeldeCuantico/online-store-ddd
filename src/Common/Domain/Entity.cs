@@ -7,9 +7,17 @@
         public Entity(EntityId id)
         {
             Id = id;
+            DomainEvents = new List<IDomainEvent>();
         }
 
         public virtual EntityId Id { get; protected set; }
+
+        public List<IDomainEvent> DomainEvents { get; } 
+
+        public void QueueEvent(IDomainEvent domainEvent)
+        {
+            DomainEvents.Add(domainEvent);
+        }
 
         public override bool Equals(object obj)
         {

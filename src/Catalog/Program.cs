@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseWolverine();
 
 builder.Services.Configure<PostgreSQLSettings>(builder.Configuration.GetSection(nameof(PostgreSQLSettings)));
+builder.Services.Configure<RedisSettings>(builder.Configuration.GetSection(nameof(RedisSettings)));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -21,6 +22,12 @@ builder.Services.AddDbContext<CatalogContext>(options =>
 {
     var postgreSqlSettings = builder.Configuration.GetSection(nameof(PostgreSQLSettings))?.Get<PostgreSQLSettings>();
     options.UseNpgsql(postgreSqlSettings.ConnectionString);
+});
+
+builder.Services.AddStackExchangeRedisCache(options => {
+    var redisSettings = builder.Configuration.GetSection(nameof(RedisSettings))?.Get<RedisSettings>();
+    options.Configuration = $"{redisSettings.HostName},password={redisSettings.Password},ssl=False,abortConnect=False";
+    options.InstanceName = redisSettings.InstanceName;
 });
 
 builder.Services.AddScoped<IDbContext, CatalogContext>();
