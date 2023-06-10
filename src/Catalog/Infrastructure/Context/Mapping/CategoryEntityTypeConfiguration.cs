@@ -15,6 +15,9 @@ namespace Catalog.Infrastructure.Context.Mapping
             builder.OwnsOne(c => c.Name).Property(p=>p.Value).HasColumnName("Name").IsRequired();
             builder.OwnsOne(c => c.Description).Property(p => p.Value).HasColumnName("Description").IsRequired();
             builder.Ignore(c => c.DomainEvents);
+            builder.Property<DateTime>("CreateDate");
+            builder.Property<DateTime>("UpdateDate");
+            builder.Property<DateTime?>("DeleteDate");
         }
     }
 }

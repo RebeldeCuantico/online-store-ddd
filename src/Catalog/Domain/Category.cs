@@ -20,6 +20,11 @@ namespace Catalog.Domain
 
         public Description Description { get; private set; }
 
+        public void Remove()
+        {
+            QueueEvent(new CategoryRemoved(Id.Value, Name.Value, Description.Value));
+        }
+
         public void ChangeName(string name)
         {
             var oldName = Name.Value;

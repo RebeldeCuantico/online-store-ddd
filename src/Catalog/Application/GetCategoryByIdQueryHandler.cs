@@ -1,20 +1,21 @@
-﻿using Catalog.Domain;
-using Common.Domain;
+﻿using Catalog.Application.DTOs;
+using Common.Infrastructure;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace Catalog.Application
 {
     public class GetCategoryByIdQueryHandler
     {
-        private readonly ICatalogRepository _repository;
+        private readonly IDistributedCache _cache;
 
-        public GetCategoryByIdQueryHandler(ICatalogRepository repository)
+        public GetCategoryByIdQueryHandler(IDistributedCache cache)
         {
-            _repository = repository;
+            _cache = cache;
         }
 
-        public async Task<Category> Handle(GetCategoryByIdQuery getCategoryByIdQuery)
+        public async Task<CategoryDto> Handle(GetCategoryByIdQuery getCategoryByIdQuery)
         {
-            return await _repository.GetById(new EntityId(getCategoryByIdQuery.id));
+            return await _cache.GetRecord<CategoryDto>(getCategoryByIdQuery.id.ToString());
         }
     }
 }

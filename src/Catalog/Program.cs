@@ -1,10 +1,12 @@
 using Catalog.Application;
+using Catalog.Application.DTOs;
 using Catalog.Domain;
 using Catalog.Infrastructure.Context;
 using Catalog.Infrastructure.Repository;
 using Catalog.Infrastructure.Settings;
 using Common.Domain;
 using Common.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Oakton;
 using Wolverine;
@@ -24,7 +26,8 @@ builder.Services.AddDbContext<CatalogContext>(options =>
     options.UseNpgsql(postgreSqlSettings.ConnectionString);
 });
 
-builder.Services.AddStackExchangeRedisCache(options => {
+builder.Services.AddStackExchangeRedisCache(options =>
+{
     var redisSettings = builder.Configuration.GetSection(nameof(RedisSettings))?.Get<RedisSettings>();
     options.Configuration = $"{redisSettings.HostName},password={redisSettings.Password},ssl=False,abortConnect=False";
     options.InstanceName = redisSettings.InstanceName;
@@ -43,9 +46,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapGet("/category/{id}", async (IMessageBus bus, Guid id) => 
+app.MapGet("/category/{id}", async (IMessageBus bus, Guid id) =>
 {
-    var result = await bus.InvokeAsync<Category>(new GetCategoryByIdQuery(id));
+    //TODO: validar datos de entrada
+    var result = await bus.InvokeAsync<CategoryDto>(new GetCategoryByIdQuery(id));
+    if (result is null)
+    {
+        return Results.NotFound();
+    }
+
     return Results.Ok(result);
 })
 .WithName("GetCategory")
@@ -53,7 +62,7 @@ app.MapGet("/category/{id}", async (IMessageBus bus, Guid id) =>
 
 app.MapGet("/category", async (IMessageBus bus) =>
 {
-    var result = await bus.InvokeAsync<List<Category>>(new GetCategoriesQuery());
+    var result = await bus.InvokeAsync<List<CategoryDto>>(new GetCategoriesQuery());
     return Results.Ok(result);
 })
 .WithName("GetAllCategories")
@@ -66,6 +75,32 @@ app.MapPost("/category", async (IMessageBus bus, AddCategoryCommand addCategory)
 })
 .WithName("AddCategory")
 .WithOpenApi();
+
+app.MapDelete("/category/{id}", async (IMessageBus bus, Guid id) =>
+{
+    var result = await bus.InvokeAsync<Guid>(new DeleteCategoryCommand(id));
+    if (result == Guid.Empty)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(result);
+})
+.WithName("DeleteCategory")
+.WithOpenApi();
+
+app.MapPut("/category", async (IMessageBus bus, UpdateCategoryCommand updateCategoryCommand) =>
+{
+    var result = await bus.InvokeAsync<CategoryDto>(updateCategoryCommand);
+    if (result is null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(result);
+})
+.WithName("UpdateCategory")
+.WithOpenApi(); ;
 
 return await app.RunOaktonCommands(args);
 
