@@ -1,6 +1,5 @@
 ﻿using Common.Domain;
 using Wolverine;
-//using Microsoft.EntityFrameworkCore;
 
 namespace Common.Infrastructure
 {

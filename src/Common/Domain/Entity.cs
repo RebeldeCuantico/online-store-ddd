@@ -12,10 +12,15 @@
 
         public virtual EntityId Id { get; protected set; }
 
-        public List<IDomainEvent> DomainEvents { get; } 
+        public List<IDomainEvent> DomainEvents { get; private set; }
 
         public void QueueEvent(IDomainEvent domainEvent)
         {
+            if (DomainEvents is null)
+            { 
+                DomainEvents = new List<IDomainEvent>(); 
+            }
+
             DomainEvents.Add(domainEvent);
         }
 

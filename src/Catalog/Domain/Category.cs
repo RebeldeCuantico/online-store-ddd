@@ -30,7 +30,7 @@ namespace Catalog.Domain
             var oldName = Name.Value;
             Name = new Name(name);
 
-            QueueEvent(new CategoryNameModified(Id.Value, oldName, name));
+            QueueEvent(new CategoryModified(Id.Value, oldName, name, CategoryFieldName.CategoryName));
         }
 
         public void ChangeDescription(string description)
@@ -38,7 +38,7 @@ namespace Catalog.Domain
             var oldDescription = Description.Value;
             Description = new Description(description);
 
-            QueueEvent(new CategoryDescriptionModified(Id.Value, oldDescription, description));
+            QueueEvent(new CategoryModified(Id.Value, oldDescription, description, CategoryFieldName.CategoryDescription));
         }
     }
 }

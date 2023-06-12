@@ -6,14 +6,24 @@ using Catalog.Infrastructure.Repository;
 using Catalog.Infrastructure.Settings;
 using Common.Domain;
 using Common.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Oakton;
 using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseWolverine();
+builder.Host.UseWolverine((options) => 
+{
+    //options.LocalQueueFor<CategoryModified>().UseDurableInbox().MaximumParallelMessages(1);
+    //options.Policies.LogMessageStarting(LogLevel.Debug);
+    ////options.PublishMessage<CategoryModified>().ToLocalQueue("DomainEvents");
+    ////options.LocalQueue("DomainEvents").Sequential();
+
+
+    ////options.Policies.ConfigureConventionalLocalRouting()
+    ////       // Optionally configure the local queues
+    ////       .CustomizeQueues((type, listener) => { listener.Sequential();});
+});
 
 builder.Services.Configure<PostgreSQLSettings>(builder.Configuration.GetSection(nameof(PostgreSQLSettings)));
 builder.Services.Configure<RedisSettings>(builder.Configuration.GetSection(nameof(RedisSettings)));
