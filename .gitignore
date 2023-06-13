@@ -351,3 +351,6 @@ MigrationBackup/
 
 # Ignore tool config
 .config/
+
+# Ignore Docker Folder
+/docker/
