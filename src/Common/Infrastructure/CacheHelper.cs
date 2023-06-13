@@ -64,7 +64,9 @@ namespace Common.Infrastructure
                                                   string type)
         {
             var ids = await GetAllIds(cache, type);
-            ids.Remove(recordId);
+            var isDeleted = ids.Remove(recordId);
+            await cache.RemoveAsync(type);
+            await SaveIds(cache, type, ids);
         }
 
         private static async Task AddId(this IDistributedCache cache,
@@ -73,7 +75,13 @@ namespace Common.Infrastructure
         {
             var ids = await GetAllIds(cache, type);
             ids.Add(recordId);
-            await SetRecord<List<string>>(cache, type, ids);
+            await SaveIds(cache, type, ids);
+        }
+
+        private static async Task SaveIds(IDistributedCache cache, string type, List<string> ids)
+        {
+            var jsonData = JsonSerializer.Serialize(ids);
+            await cache.SetStringAsync(type, jsonData);
         }
 
         private static async Task<List<string>> GetAllIds(this IDistributedCache cache,

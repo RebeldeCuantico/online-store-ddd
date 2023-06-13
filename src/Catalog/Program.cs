@@ -1,6 +1,7 @@
 using Catalog.Application;
 using Catalog.Application.DTOs;
 using Catalog.Domain;
+using Catalog.Domain.DomainEvents;
 using Catalog.Infrastructure.Context;
 using Catalog.Infrastructure.Repository;
 using Catalog.Infrastructure.Settings;
@@ -16,8 +17,8 @@ builder.Host.UseWolverine((options) =>
 {
     //options.LocalQueueFor<CategoryModified>().UseDurableInbox().MaximumParallelMessages(1);
     //options.Policies.LogMessageStarting(LogLevel.Debug);
-    ////options.PublishMessage<CategoryModified>().ToLocalQueue("DomainEvents");
-    ////options.LocalQueue("DomainEvents").Sequential();
+    options.PublishMessage<CategoryModified>().ToLocalQueue("DomainEvents");
+    options.LocalQueue("DomainEvents").Sequential();
 
 
     ////options.Policies.ConfigureConventionalLocalRouting()
