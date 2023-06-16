@@ -5,6 +5,7 @@ using Catalog.Domain.DomainEvents;
 using Catalog.Infrastructure.Context;
 using Catalog.Infrastructure.Repository;
 using Catalog.Infrastructure.Settings;
+using Catalog.Workers;
 using Common.Domain;
 using Common.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -15,19 +16,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseWolverine((options) => 
 {
-    //options.LocalQueueFor<CategoryModified>().UseDurableInbox().MaximumParallelMessages(1);
-    //options.Policies.LogMessageStarting(LogLevel.Debug);
     options.PublishMessage<CategoryModified>().ToLocalQueue("DomainEvents");
     options.LocalQueue("DomainEvents").Sequential();
-
-
-    ////options.Policies.ConfigureConventionalLocalRouting()
-    ////       // Optionally configure the local queues
-    ////       .CustomizeQueues((type, listener) => { listener.Sequential();});
 });
 
 builder.Services.Configure<PostgreSQLSettings>(builder.Configuration.GetSection(nameof(PostgreSQLSettings)));
 builder.Services.Configure<RedisSettings>(builder.Configuration.GetSection(nameof(RedisSettings)));
+builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection(nameof(KafkaSettings)));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -47,6 +42,8 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddScoped<IDbContext, CatalogContext>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICatalogRepository, CatalogRepository>();
+
+builder.Services.AddHostedService<CatalogWorker>();
 
 var app = builder.Build();
 

@@ -16,7 +16,7 @@ This project is licensed under the MIT License. For more information, please ref
 
 ## Contact
 
-For any questions or comments, feel free to reach out to us via @RebeldeCuantico in Twitter.
+For any questions or comments, feel free to reach out to us via Discord.
 
 Enjoy the live development experience!
 
