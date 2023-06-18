@@ -1,4 +1,4 @@
-﻿namespace Catalog.Infrastructure.Settings
+﻿namespace Common.Infrastructure
 {
     public class KafkaSettings
     {

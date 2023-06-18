@@ -1,6 +1,8 @@
-﻿namespace Catalog.Application.DTOs
+﻿using Common.Infrastructure;
+
+namespace Catalog.Application.DTOs
 {
-    public class CategoryDto
+    public class CategoryDto : IMessage
     {
         public Guid Id { get; set; }
 

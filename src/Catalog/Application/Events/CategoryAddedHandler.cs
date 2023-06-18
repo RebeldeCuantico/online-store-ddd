@@ -1,23 +1,20 @@
 ﻿using Catalog.Application.DTOs;
 using Catalog.Domain.DomainEvents;
-using Catalog.Infrastructure.Settings;
 using Common.Infrastructure;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Options;
 
 namespace Catalog.Application.Events
 {
     public class CategoryAddedHandler
     {
         private readonly IDistributedCache _cache;
+        private readonly IProducer _producer;
 
-        public JsonProducer<CategoryDto> producer { get; private set; }
-
-        public CategoryAddedHandler(IDistributedCache cache, IOptions<KafkaSettings> kafkaSettingOptions)
+        public CategoryAddedHandler(IDistributedCache cache, IProducer producer)
         {
             _cache = cache;
-            producer = new JsonProducer<CategoryDto>(kafkaSettingOptions.Value.BootstrapServer, kafkaSettingOptions.Value.SchemaRegistryUrl, "Category");
-            producer.Build();
+            _producer = producer;
+            _producer.Connect<CategoryDto>("Category");
         }
 
         public async Task Handle(CategoryAdded categoryAdded)
@@ -31,7 +28,7 @@ namespace Catalog.Application.Events
 
             var cache = _cache.SetRecord<CategoryDto>(categoryAdded.CategoryId.ToString(), category);
 
-            var messageBroker = producer.ProduceAsync(category);
+            var messageBroker = _producer.PublishAsync(category);
 
             Task.WaitAll(cache, messageBroker);
         }

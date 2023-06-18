@@ -42,6 +42,9 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddScoped<IDbContext, CatalogContext>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICatalogRepository, CatalogRepository>();
+builder.Services.AddTransient<IConsumer, KafkaConsumer>();
+builder.Services.AddTransient<IProducer, KafkaProducer>();
+builder.Services.AddTransient<IServiceBus, KafkaServiceBus>();
 
 builder.Services.AddHostedService<CatalogWorker>();
 

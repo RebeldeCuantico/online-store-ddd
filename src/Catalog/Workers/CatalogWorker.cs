@@ -1,25 +1,21 @@
 ﻿using Catalog.Application.DTOs;
-using Catalog.Infrastructure.Settings;
 using Common.Infrastructure;
-using Microsoft.Extensions.Options;
 
 namespace Catalog.Workers
 {
     public class CatalogWorker : BackgroundService
     {
-        private JsonConsumer<CategoryDto> consumer;
+        private readonly IConsumer _consumer;
 
-        public CatalogWorker(IOptions<KafkaSettings> kafkaSettingOptions)
+        public CatalogWorker(IConsumer consumer)
         {
-            consumer = new JsonConsumer<CategoryDto>(kafkaSettingOptions.Value.BootstrapServer,
-                                                     kafkaSettingOptions.Value.SchemaRegistryUrl,
-                                                     "Category",
-                                                     "cg-1");
+            _consumer = consumer;
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
-            consumer.Build();
+            _consumer.Connect<CategoryDto>("Category", "cg-1");
+
             return base.StartAsync(cancellationToken);
         }
 
@@ -27,13 +23,17 @@ namespace Catalog.Workers
         {
             await Task.Run(() =>
             {
-                var result = consumer.Consume();
-            });
+                _consumer.Consume<CategoryDto>(message =>
+                {
+                    ; //TODO more stuff
+                });
+                
+            }, stoppingToken);
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)
         {
-            consumer.Close();
+            _consumer.Close();
             return base.StopAsync(cancellationToken);
         }
     }
