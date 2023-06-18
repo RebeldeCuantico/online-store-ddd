@@ -25,7 +25,10 @@ namespace Catalog.Workers
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var result = consumer.Consume();
+            await Task.Run(() =>
+            {
+                var result = consumer.Consume();
+            });
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)
