@@ -8,6 +8,7 @@ using Catalog.Infrastructure.Settings;
 using Catalog.Workers;
 using Common.Domain;
 using Common.Infrastructure;
+using Consul;
 using Microsoft.EntityFrameworkCore;
 using Oakton;
 using Wolverine;
@@ -47,6 +48,18 @@ builder.Services.AddTransient<IProducer, KafkaProducer>();
 builder.Services.AddTransient<IServiceBus, KafkaServiceBus>();
 
 builder.Services.AddHostedService<CatalogWorker>();
+
+
+var consulClient = new ConsulClient();
+var registration = new AgentServiceRegistration()
+{
+    ID = "ms-catalog",
+    Name = "catalog",
+    Address = "localhost",
+    Port = 5000
+};
+
+await consulClient.Agent.ServiceRegister(registration);
 
 var app = builder.Build();
 
