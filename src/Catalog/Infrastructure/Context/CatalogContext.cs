@@ -14,6 +14,8 @@ namespace Catalog.Infrastructure.Context
 
         public DbSet<Category> Categories => Set<Category>();
 
+        public DbSet<Product>  Products => Set<Product>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
