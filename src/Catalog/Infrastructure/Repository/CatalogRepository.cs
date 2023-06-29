@@ -1,17 +1,14 @@
 ﻿using Catalog.Domain;
 using Common.Domain;
+using Common.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Infrastructure.Repository
 {
-    public class CatalogRepository : ICatalogRepository
+    public class CatalogRepository : RepositoryBase<Category>, ICatalogRepository
     {
-        protected DbSet<Category> entity;
-
         public CatalogRepository(IDbContext context)
-        {
-            entity = context.Set<Category>();
-        }
+            : base(context) { }
 
         public EntityId AddCategory(Category category)
         {

@@ -1,8 +1,9 @@
 ﻿using Common.Domain;
+using Common.Infrastructure;
 
 namespace Catalog.Domain
 {
-    public interface ICatalogRepository
+    public interface ICatalogRepository : IRepositoryBase<Category>
     {
         EntityId AddCategory(Category category);
         Task<List<Category>> GetAll();

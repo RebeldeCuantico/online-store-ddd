@@ -1,5 +1,4 @@
-using Catalog.Application;
-using Catalog.Application.DTOs;
+using Catalog.Api;
 using Catalog.Domain;
 using Catalog.Domain.DomainEvents;
 using Catalog.Infrastructure.Context;
@@ -43,6 +42,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddScoped<IDbContext, CatalogContext>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICatalogRepository, CatalogRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddTransient<IConsumer, KafkaConsumer>();
 builder.Services.AddTransient<IProducer, KafkaProducer>();
 builder.Services.AddTransient<IServiceBus, KafkaServiceBus>();
@@ -70,61 +70,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapGet("/category/{id}", async (IMessageBus bus, Guid id) =>
-{
-    //TODO: validar datos de entrada
-    var result = await bus.InvokeAsync<CategoryDto>(new GetCategoryByIdQuery(id));
-    if (result is null)
-    {
-        return Results.NotFound();
-    }
-
-    return Results.Ok(result);
-})
-.WithName("GetCategory")
-.WithOpenApi(); ;
-
-app.MapGet("/category", async (IMessageBus bus) =>
-{
-    var result = await bus.InvokeAsync<List<CategoryDto>>(new GetCategoriesQuery());
-    return Results.Ok(result);
-})
-.WithName("GetAllCategories")
-.WithOpenApi();
-
-app.MapPost("/category", async (IMessageBus bus, AddCategoryCommand addCategory) =>
-{
-    var result = await bus.InvokeAsync<Guid>(addCategory);
-    return Results.Created($"/category/{result}", result);
-})
-.WithName("AddCategory")
-.WithOpenApi();
-
-app.MapDelete("/category/{id}", async (IMessageBus bus, Guid id) =>
-{
-    var result = await bus.InvokeAsync<Guid>(new DeleteCategoryCommand(id));
-    if (result == Guid.Empty)
-    {
-        return Results.NotFound();
-    }
-
-    return Results.Ok(result);
-})
-.WithName("DeleteCategory")
-.WithOpenApi();
-
-app.MapPut("/category", async (IMessageBus bus, UpdateCategoryCommand updateCategoryCommand) =>
-{
-    var result = await bus.InvokeAsync<CategoryDto>(updateCategoryCommand);
-    if (result is null)
-    {
-        return Results.NotFound();
-    }
-
-    return Results.Ok(result);
-})
-.WithName("UpdateCategory")
-.WithOpenApi(); ;
+app.AddCategoryController();
+app.AddProductController();
 
 return await app.RunOaktonCommands(args);
 

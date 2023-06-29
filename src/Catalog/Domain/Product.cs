@@ -1,4 +1,5 @@
-﻿using Common.Domain;
+﻿using Catalog.Domain.DomainEvents;
+using Common.Domain;
 
 namespace Catalog.Domain
 {
@@ -8,7 +9,8 @@ namespace Catalog.Domain
         {
         }
 
-        public Product(Name name, ProductCode productCode, Description description, Price price, AvailableStock availableStock, ReferenceId categoryId)
+        public Product(EntityId id, Name name, ProductCode productCode, Description description, Price price, AvailableStock availableStock, ReferenceId categoryId)
+            : base(id)
         {
             Name = name;
             ProductCode = productCode;
@@ -16,7 +18,7 @@ namespace Catalog.Domain
             Price = price;
             AvailableStock = availableStock;
             CategoryId = categoryId;
-            //Eventos
+            QueueEvent((ProductAdded)this);
         }
 
         public Name Name { get; private set; }
@@ -33,8 +35,9 @@ namespace Catalog.Domain
 
         public void ChangePrice(Price price)
         {
-            //Eventos 
+            var @event = new PriceChanged(Id.Value, Price.Value, price.Value);
             Price = price;
+            QueueEvent(@event);
         }
 
         public void RemoveStock(int quantity)
@@ -55,7 +58,9 @@ namespace Catalog.Domain
                 throw new Exception($"The quantity cannot be more than the available stock {AvailableStock.Value}");
             }
 
+            var @event = new StockChanged(Id.Value, AvailableStock.Value, AvailableStock.Value - quantity);
             AvailableStock = new AvailableStock(AvailableStock.Value - quantity);
+            QueueEvent(@event);
         }
 
         public void AddStock(int quantity)
@@ -65,7 +70,9 @@ namespace Catalog.Domain
                 throw new Exception($"The quantity cannot be {quantity}");
             }
 
+            var @event = new StockChanged(Id.Value, AvailableStock.Value, AvailableStock.Value + quantity);
             AvailableStock = new AvailableStock(AvailableStock.Value + quantity);
+            QueueEvent(@event);
         }
     }
 }
