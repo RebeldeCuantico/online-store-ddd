@@ -1,6 +1,10 @@
 ﻿using Common.Infrastructure.ServiceDiscovery;
+using Consul;
 using Microsoft.Extensions.Options;
+using ReverseProxy.Security;
+using System.Net.Http.Headers;
 using Yarp.ReverseProxy.Configuration;
+using Yarp.ReverseProxy.Transforms;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -11,6 +15,25 @@ namespace Microsoft.Extensions.DependencyInjection
             var serviceDiscoverySettings = options.Value;
             services.AddReverseProxy()
                    .LoadFromMemory(GetRoutes(serviceDiscoverySettings.Apis), GetClusters(serviceDiscovery, serviceDiscoverySettings.Apis));
+
+            //.AddTransforms(ctx =>
+            //{
+            //    if (string.Equals(ctx.Route.AuthorizationPolicy, "auth"))
+            //    {
+            //        ctx.AddRequestTransform(async transformContext =>
+            //        {
+            //            var token = transformContext.HttpContext.Session.GetString(SessionKeys.AccessToken);
+            //            if (string.IsNullOrEmpty(token))
+            //            {
+            //                var response = transformContext.HttpContext.Response;
+            //                response.StatusCode = 401;
+            //                return;
+            //            }
+
+            //            transformContext.HttpContext.Request.Headers.Add("Authorization", $"Bearer {token}");
+            //        });
+            //    }
+            //});
 
             return services;
         }
@@ -24,6 +47,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 routeConfigs.Add(new RouteConfig
                 {
                     RouteId = "route" + Random.Shared.Next(),
+                    AuthorizationPolicy = "auth",
                     ClusterId = api,
                     Match = new RouteMatch
                     {

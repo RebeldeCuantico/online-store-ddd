@@ -2,6 +2,6 @@
 {
     public class IdpServiceDiscoveryConfiguration
     {
-        public string  token_endpoint { get; set; }
+        public string  TokenEndpoint { get; set; }
     }
 }

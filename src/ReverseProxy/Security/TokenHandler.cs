@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+﻿using Consul;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using System.Net;
 
 namespace ReverseProxy.Security
 {
@@ -29,6 +31,9 @@ namespace ReverseProxy.Security
             context.HttpContext.Session.SetString(SessionKeys.IdToken, idToken);
             context.HttpContext.Session.SetString(SessionKeys.RefreshToken, refreshToken);
             context.HttpContext.Session.SetString(SessionKeys.ExpiresAt, $"{expiresAt.ToUnixTimeSeconds()}");
+
+
+            context.HttpContext.Request.Headers.Add("Authorization", $"Bearer {accessToken}");
         }
     }
 }

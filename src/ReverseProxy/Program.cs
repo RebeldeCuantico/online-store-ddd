@@ -8,6 +8,7 @@ using ReverseProxy.Security;
 using ReverseProxy.Settings;
 using System.Net.Http.Json;
 using System.Security.Claims;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,13 +36,20 @@ builder.Services.AddAuthentication(options =>
 {
     setup.ExpireTimeSpan = TimeSpan.FromMinutes(5);
     setup.SlidingExpiration = true;
+    setup.LoginPath = "/login";
+    setup.AccessDeniedPath = "/login";
+    setup.ReturnUrlParameter = "redirectUrl";
 })
 .AddOpenIdConnect(options =>
 {
     var openIdConnectSettingsOptions = builder.Services.BuildServiceProvider().GetService<IOptions<OpenIdConnectSettings>>();
     var openIdConnectSettings = openIdConnectSettingsOptions.Value;
     var httpClient = new HttpClient();
-    var doc = httpClient.GetFromJsonAsync<IdpServiceDiscoveryConfiguration>(openIdConnectSettings.DiscoveryUrl).Result;
+    var docJson = httpClient.GetStringAsync(openIdConnectSettings.DiscoveryUrl).Result;
+    var doc = new IdpServiceDiscoveryConfiguration
+    {
+        TokenEndpoint = JsonDocument.Parse(docJson).RootElement.GetProperty("token_endpoint").ToString(),
+    };
 
     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.Authority = openIdConnectSettings.Authority;
@@ -72,6 +80,8 @@ builder.Services.AddAuthentication(options =>
 var serviceDiscoveryOptions = builder.Services.BuildServiceProvider().GetService<IOptions<ServiceDiscoverySettings>>();
 builder.Services.AddServiceDiscovery(serviceDiscoveryOptions);
 builder.Services.AddInternalReverseProxy(serviceDiscoveryOptions, builder.Services.BuildServiceProvider().GetRequiredService<IServiceDiscovery>());
+
+
 
 var app = builder.Build();
 app.UseRouting();

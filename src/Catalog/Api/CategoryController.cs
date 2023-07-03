@@ -8,7 +8,6 @@ namespace Catalog.Api
     {
         public static WebApplication AddCategoryController(this WebApplication app)
         {
-
             app.MapGet("/category/{id}", async (IMessageBus bus, Guid id) =>
             {
                 //TODO: validar datos de entrada
