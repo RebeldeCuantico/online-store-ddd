@@ -10,6 +10,7 @@
     <PackageReference Include="Consul" Version="1.6.10.9" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.8" />
+    <PackageReference Include="Steeltoe.Extensions.Configuration.ConfigServerCore" Version="3.2.3" />
     <PackageReference Include="Yarp.ReverseProxy" Version="2.0.0" />
   </ItemGroup>
 

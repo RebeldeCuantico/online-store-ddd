@@ -17,6 +17,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.5" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
+    <PackageReference Include="Steeltoe.Extensions.Configuration.ConfigServerCore" Version="3.2.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="WolverineFx" Version="0.9.19" />
   </ItemGroup>

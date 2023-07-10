@@ -1,0 +1,4 @@
+FROM openjdk:17
+ADD target/configserver-0.0.1-SNAPSHOT.jar configserver.jar
+EXPOSE 8888
+ENTRYPOINT [ "java", "-jar", "/configserver.jar" ]

@@ -133,3 +133,12 @@ services:
     volumes:
       - ./docker/keycloak-data-volume:/opt/keycloak/data/
     command: start-dev
+
+  #config
+  configserver:
+    build:
+      context: ./src/configserver
+      dockerfile: Dockerfile
+    ports:
+      - 8888:8888
+    container_name: configserver

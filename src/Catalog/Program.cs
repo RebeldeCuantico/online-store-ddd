@@ -10,6 +10,7 @@ using Common.Infrastructure;
 using Consul;
 using Microsoft.EntityFrameworkCore;
 using Oakton;
+using Steeltoe.Extensions.Configuration.ConfigServer;
 using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,8 @@ builder.Host.UseWolverine((options) =>
     options.PublishMessage<CategoryModified>().ToLocalQueue("DomainEvents");
     options.LocalQueue("DomainEvents").Sequential();
 });
+
+builder.AddConfigServer();
 
 builder.Services.Configure<PostgreSQLSettings>(builder.Configuration.GetSection(nameof(PostgreSQLSettings)));
 builder.Services.Configure<RedisSettings>(builder.Configuration.GetSection(nameof(RedisSettings)));

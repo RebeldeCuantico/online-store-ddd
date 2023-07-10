@@ -6,12 +6,12 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using ReverseProxy.Security;
 using ReverseProxy.Settings;
-using System.Net.Http.Json;
+using Steeltoe.Extensions.Configuration.ConfigServer;
 using System.Security.Claims;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.AddConfigServer();
 builder.Services.Configure<ServiceDiscoverySettings>(builder.Configuration.GetSection(nameof(ServiceDiscoverySettings)));
 builder.Services.Configure<OpenIdConnectSettings>(builder.Configuration.GetSection(nameof(OpenIdConnectSettings)));
 builder.Services.AddDistributedMemoryCache();
