@@ -19,7 +19,7 @@ namespace Catalog.Application
             var name = new Name(command.name);
             var productCode = new ProductCode(command.productCode);
             var description = new Description(command.description);
-            var price = new Price(command.price);
+            var price = new Price(command.price, command.currencyCode); 
             var stock = new AvailableStock(command.stock);
             var referenceId = new ReferenceId(command.categoryId);
             var id = new EntityId(Guid.NewGuid());

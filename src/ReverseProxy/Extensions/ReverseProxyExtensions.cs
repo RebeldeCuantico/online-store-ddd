@@ -70,6 +70,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
         static IReadOnlyList<ClusterConfig> GetClusters(IServiceDiscovery serviceDiscovery, string[] apis)
         {
+
+            //TODO: Revisar que ocurre si no existe alguna de las apis
             var clusterConfigs = new List<ClusterConfig>();
 
             foreach (var api in apis)
@@ -84,13 +86,13 @@ namespace Microsoft.Extensions.DependencyInjection
                         AffinityKeyName = ".Yarp.ReverseProxy.Affinity"
                     },
                     Destinations = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { api, new DestinationConfig()
-                        {
-                          Address = serviceDiscovery.GetServiceAddress(api).Result
+                    {
+                        { api, new DestinationConfig()
+                            {
+                              Address = serviceDiscovery.GetServiceAddress(api).Result
+                            }
                         }
                     }
-                }
                 });
 
             }

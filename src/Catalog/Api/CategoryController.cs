@@ -1,5 +1,6 @@
 ﻿using Catalog.Application;
 using Catalog.Application.DTOs;
+using System.Diagnostics;
 using Wolverine;
 
 namespace Catalog.Api
@@ -30,8 +31,11 @@ namespace Catalog.Api
             .WithName("GetAllCategories")
             .WithOpenApi();
 
-            app.MapPost("/category", async (IMessageBus bus, AddCategoryCommand addCategory) =>
+            app.MapPost("/category", async (IMessageBus bus, AddCategoryCommand addCategory, ActivitySource activitySource) =>
             {
+                using var activity = activitySource.StartActivity("AddCategory");
+                activity.SetTag("name", addCategory.name);
+
                 var result = await bus.InvokeAsync<Guid>(addCategory);
                 return Results.Created($"/category/{result}", result);
             })

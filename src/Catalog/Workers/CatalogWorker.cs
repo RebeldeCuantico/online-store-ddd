@@ -23,10 +23,11 @@ namespace Catalog.Workers
         {
             await Task.Run(() =>
             {
-                _consumer.Consume<CategoryDto>(message =>
-                {
-                    ; //TODO more stuff
-                });
+                //TODO: crear el tópico si no existe
+                //_consumer.Consume<CategoryDto>(message =>
+                //{
+                //    ; //TODO more stuff
+                //});
                 
             }, stoppingToken);
         }

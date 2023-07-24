@@ -9,13 +9,18 @@ using Common.Domain;
 using Common.Infrastructure;
 using Consul;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Oakton;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Steeltoe.Extensions.Configuration.ConfigServer;
+using System.Diagnostics;
 using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseWolverine((options) => 
+builder.Host.UseWolverine((options) =>
 {
     options.PublishMessage<CategoryModified>().ToLocalQueue("DomainEvents");
     options.LocalQueue("DomainEvents").Sequential();
@@ -26,6 +31,28 @@ builder.AddConfigServer();
 builder.Services.Configure<PostgreSQLSettings>(builder.Configuration.GetSection(nameof(PostgreSQLSettings)));
 builder.Services.Configure<RedisSettings>(builder.Configuration.GetSection(nameof(RedisSettings)));
 builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection(nameof(KafkaSettings)));
+
+
+
+builder.Services.AddTransient<ActivitySource>((activity) => new ActivitySource("Catalog", "1.0.0"));
+
+builder.Services.AddOpenTelemetry().WithTracing(configure =>
+{
+    var resource = ResourceBuilder.CreateDefault().AddService("Catalog", "1.0.0");
+    var activity = builder.Services.BuildServiceProvider().GetRequiredService<ActivitySource>();
+    
+    configure.AddOtlpExporter(o =>
+    {
+        o.Protocol = OtlpExportProtocol.Grpc;
+        o.Endpoint = new Uri("http://localhost:4317"); //TODO: meter por config
+    }).AddSource(activity.Name)
+    .AddHttpClientInstrumentation()
+    .AddAspNetCoreInstrumentation()
+    .AddNpgsql()
+    .AddConsoleExporter()
+    .SetResourceBuilder(resource);
+});
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -17,6 +17,8 @@ namespace Catalog.Application.DTOs
         public Guid CategoryId { get; set; }
 
         public string ProductCode { get; set; }
+        
+        public string Currency { get; private set; }
 
         public static explicit operator ProductDto(Product product)
         {
@@ -26,7 +28,8 @@ namespace Catalog.Application.DTOs
                 AvailableStock = product.AvailableStock.Value,
                 CategoryId = product.CategoryId.Value,
                 ProductCode = product.ProductCode.Value,
-                Price = product.Price.Value,
+                Price = product.Price.Amount,
+                Currency = product.Price.Currency.Symbol,
                 Name = product.Name.Value,
                 Description = product.Description.Value,
             };

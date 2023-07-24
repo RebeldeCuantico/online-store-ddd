@@ -35,7 +35,7 @@ namespace Catalog.Domain
 
         public void ChangePrice(Price price)
         {
-            var @event = new PriceChanged(Id.Value, Price.Value, price.Value);
+            var @event = new PriceChanged(Id.Value, Price.Amount, price.Amount);
             Price = price;
             QueueEvent(@event);
         }
