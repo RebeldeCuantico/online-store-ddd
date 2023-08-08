@@ -353,7 +353,9 @@ MigrationBackup/
 .config/
 
 # Ignore Docker Folder
-/docker/
+/docker/Data/
+/docker/keycloak-data-volume/
+/docker/logs/
 
 HELP.md
 src/configserver/target/

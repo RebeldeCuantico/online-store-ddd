@@ -17,6 +17,11 @@ using OpenTelemetry.Trace;
 using Steeltoe.Extensions.Configuration.ConfigServer;
 using System.Diagnostics;
 using Wolverine;
+using Prometheus;
+using Catalog.Infrastructure.Diagnostics;
+using Serilog;
+using Common.Infrastructure.Logging;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,7 +81,6 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddTransient<IConsumer, KafkaConsumer>();
 builder.Services.AddTransient<IProducer, KafkaProducer>();
 builder.Services.AddTransient<IServiceBus, KafkaServiceBus>();
-
 builder.Services.AddHostedService<CatalogWorker>();
 
 
@@ -91,6 +95,17 @@ var registration = new AgentServiceRegistration()
 
 await consulClient.Agent.ServiceRegister(registration);
 
+builder.Logging.ClearProviders();
+var logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .Filter.ByExcluding(e => e.Properties.ContainsKey("RequestPath") && e.Properties["RequestPath"].ToString().Contains("/metrics"))
+    .WriteTo.Console(new ElasticSearchJsonFormatterWithSpan())
+    .WriteTo.File(new ElasticSearchJsonFormatterWithSpan(), "../../docker/logs/catalog/catalog-.log", LevelAlias.Minimum, rollingInterval: RollingInterval.Hour)
+    .CreateLogger();
+
+builder.Logging.AddSerilog(logger);
+builder.Services.AddSingleton<CategoryControllerDiagnostics>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -99,6 +114,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHttpMetrics();
+app.UseMetricServer();
 
 app.AddCategoryController();
 app.AddProductController();

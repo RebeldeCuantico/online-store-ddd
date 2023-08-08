@@ -166,4 +166,43 @@ services:
       - "16686:16686"
       - "14250" 
 
+  prometheus:
+    image: prom/prometheus:latest
+    command: --config.file=/etc/prometheus/prometheus.yml --enable-feature=exemplar-storage
+    container_name: prometheus  
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./docker/Configuration/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  fluentbit:
+    image: fluent/fluent-bit
+    depends_on:      
+      - loki
+    volumes:
+      - ./docker/Configuration/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./docker/Configuration/parsers.conf:/fluent-bit/etc/parsers.conf
+      - ./docker/logs:/var/log:ro
   
+  loki:
+    image: grafana/loki:latest
+    command: [ "-config.file=/etc/loki/local-config.yaml" ]
+    volumes:
+      - ./docker/Configuration/loki-config.yaml:/etc/loki/local-config.yaml
+
+  grafana:   
+    image: grafana/grafana:latest  
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./docker/Configuration/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      # - ./docker/Configuration/dashboard.yaml:/etc/grafana/provisioning/dashboards/main.yaml
+      # - ./docker/Configuration/Dashboard:/var/lib/grafana/dashboards
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    depends_on:
+      - prometheus
+      - jaeger
+      - loki

@@ -1,0 +1,24 @@
+## otel-collector-config.yaml
+receivers:
+  otlp:
+    protocols:
+      grpc:
+
+processors:
+  batch:
+
+exporters:
+  jaeger:
+    endpoint: jaeger:14250
+    tls:  
+      insecure: true
+  
+  logging:
+    loglevel: debug
+
+service:  
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [jaeger, logging]
+      processors: [batch]
